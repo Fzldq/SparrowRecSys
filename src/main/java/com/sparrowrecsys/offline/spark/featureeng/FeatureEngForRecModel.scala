@@ -33,7 +33,7 @@ object FeatureEngForRecModel {
     //add movie basic features
     val samplesWithMovies1 = ratingSamples.join(movieSamples, Seq("movieId"), "left")
     //add release year
-    val extractReleaseYearUdf = udf({(title: String) => {
+    val extractReleaseYearUdf = udf((title: String) => {
       if (null == title || title.trim.length < 6) {
         1990 // default value
       }
@@ -41,10 +41,10 @@ object FeatureEngForRecModel {
         val yearString = title.trim.substring(title.length - 5, title.length - 1)
         yearString.toInt
       }
-    }})
+    })
 
     //add title
-    val extractTitleUdf = udf({(title: String) => {title.trim.substring(0, title.trim.length - 6).trim}})
+    val extractTitleUdf = udf((title: String) => {title.trim.substring(0, title.trim.length - 6).trim})
 
     val samplesWithMovies2 = samplesWithMovies1.withColumn("releaseYear", extractReleaseYearUdf(col("title")))
       .withColumn("title", extractTitleUdf(col("title")))
@@ -71,7 +71,7 @@ object FeatureEngForRecModel {
     samplesWithMovies4
   }
 
-  val extractGenres: UserDefinedFunction = udf { (genreArray: Seq[String]) => {
+  val extractGenres: UserDefinedFunction = udf ((genreArray: Seq[String]) => {
     val genreMap = mutable.Map[String, Int]()
     genreArray.foreach((element:String) => {
       val genres = element.split("\\|")
@@ -81,7 +81,7 @@ object FeatureEngForRecModel {
     })
     val sortedGenres = ListMap(genreMap.toSeq.sortWith(_._2 > _._2):_*)
     sortedGenres.keys.toSeq
-  }}
+  })
 
   def addUserFeatures(ratingSamples:DataFrame): DataFrame ={
     val samplesWithUserFeatures = ratingSamples

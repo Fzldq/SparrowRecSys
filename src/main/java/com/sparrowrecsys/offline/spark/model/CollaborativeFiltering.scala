@@ -1,5 +1,6 @@
 package com.sparrowrecsys.offline.spark.model
 
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkConf
 import org.apache.spark.ml.evaluation.{BinaryClassificationEvaluator, RegressionEvaluator}
 import org.apache.spark.ml.recommendation.ALS
@@ -10,6 +11,8 @@ import org.apache.spark.sql.functions._
 object CollaborativeFiltering {
 
   def main(args: Array[String]): Unit = {
+    Logger.getLogger("org").setLevel(Level.ERROR)
+
     val conf = new SparkConf()
       .setMaster("local")
       .setAppName("collaborativeFiltering")
@@ -79,7 +82,7 @@ object CollaborativeFiltering {
       .setNumFolds(10)  // Use 3+ in practice
     val cvModel = cv.fit(test)
     val avgMetrics = cvModel.avgMetrics
-
+    println(avgMetrics.mkString("Array(", ", ", ")"))
     spark.stop()
   }
 }
