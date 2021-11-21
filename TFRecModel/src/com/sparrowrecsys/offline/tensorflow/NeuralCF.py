@@ -92,8 +92,8 @@ model = neural_cf_model_1(inputs, [movie_emb_col], [user_emb_col], [10, 10])
 model.compile(
     loss='binary_crossentropy',
     optimizer='adam',
-    metrics=['accuracy', tf.keras.metrics.AUC(curve='ROC'),
-             tf.keras.metrics.AUC(curve='PR')])
+    metrics=['accuracy', tf.keras.metrics.AUC(curve='ROC', name='AUC-ROC'),
+             tf.keras.metrics.AUC(curve='PR', name='AUC-PR')])
 
 # train the model
 model.fit(train_dataset, epochs=5)

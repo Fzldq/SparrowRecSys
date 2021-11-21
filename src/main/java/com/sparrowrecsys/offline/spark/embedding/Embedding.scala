@@ -1,7 +1,6 @@
 package com.sparrowrecsys.offline.spark.embedding
 
 import java.io.{BufferedWriter, File, FileWriter}
-
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkConf
 import org.apache.spark.ml.feature.BucketedRandomProjectionLSH
@@ -14,6 +13,8 @@ import org.apache.spark.sql.{Row, SparkSession}
 import redis.clients.jedis.Jedis
 import redis.clients.jedis.params.SetParams
 
+import java.text.SimpleDateFormat
+import java.util.Date
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
@@ -267,7 +268,7 @@ object Embedding {
 
   def main(args: Array[String]): Unit = {
     Logger.getLogger("org").setLevel(Level.ERROR)
-
+    println("Start time: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date))
     val conf = new SparkConf()
       .setMaster("local")
       .setAppName("ctrModel")
@@ -279,8 +280,14 @@ object Embedding {
     val embLength = 10
 
     val samples = processItemSequence(spark, rawSampleDataPath)
-    val model = trainItem2vec(spark, samples, embLength, "item2vecEmb.csv", saveToRedis = true, "i2vEmb")
-    graphEmb(samples, spark, embLength, "itemGraphEmb.csv", saveToRedis = true, "graphEmb")
-    generateUserEmb(spark, rawSampleDataPath, model, embLength, "userEmb.csv", saveToRedis = true, "uEmb")
+    println("Start generating Item2vec...")
+    val model = trainItem2vec(spark, samples, embLength, "item2vecEmb.csv", saveToRedis = false, "i2vEmb")
+    println("Start generating GraphEmb...")
+    graphEmb(samples, spark, embLength, "itemGraphEmb.csv", saveToRedis = false, "graphEmb")
+    println("Start generating UserEmb...")
+    generateUserEmb(spark, rawSampleDataPath, model, embLength, "userEmb.csv", saveToRedis = false, "uEmb")
+
+    val date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date)
+    println("End time: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date))
   }
 }
